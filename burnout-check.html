@@ -646,27 +646,23 @@ nav .wrap {
     <section class="hero">
       <span class="hero-eyebrow">인증</span>
       <h1>나의 기록을 보려면<br><em>로그인이 필요합니다</em></h1>
-      <p class="hero-sub">이메일로 6자리 인증 코드를 받아 로그인하세요.</p>
+      <p class="hero-sub">이메일 주소를 입력하면 로그인 링크를 보내드립니다.<br>링크를 클릭하면 바로 로그인됩니다.</p>
 
       <div id="login-email-step" style="max-width:360px;margin:0 auto;">
         <div class="input-row">
           <input type="email" id="login-email" placeholder="이메일 주소" />
-          <button onclick="sendOtp()">코드 받기</button>
+          <button onclick="sendOtp()">링크 받기</button>
         </div>
         <p id="login-msg" style="font-size:12px;color:var(--text3);margin-top:10px;min-height:18px;"></p>
       </div>
 
-      <div id="login-otp-step" style="display:none;max-width:360px;margin:0 auto;">
-        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
-          이메일로 전송된 6자리 코드를 입력하세요.
+      <div id="login-sent-step" style="display:none;max-width:360px;margin:0 auto;">
+        <p style="font-size:14px;color:var(--teal-text);margin-bottom:8px;">✓ 로그인 링크를 발송했습니다</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.7;">
+          이메일을 확인하고 <strong style="color:var(--text);">Sign in</strong> 링크를 클릭하면<br>
+          자동으로 로그인됩니다.
         </p>
-        <div class="input-row">
-          <input type="text" id="login-otp" placeholder="123456" maxlength="6"
-                 inputmode="numeric" pattern="[0-9]*" />
-          <button onclick="verifyOtp()">로그인</button>
-        </div>
-        <p id="login-otp-msg" style="font-size:12px;color:var(--red-text);margin-top:10px;min-height:18px;"></p>
-        <button class="btn-ghost" style="margin-top:12px;" onclick="backToEmail()">← 이메일 다시 입력</button>
+        <button class="btn-ghost" onclick="backToEmail()">← 다른 이메일로 시도</button>
       </div>
     </section>
   </div>
@@ -975,29 +971,22 @@ async function sendOtp() {
   if (!email) return;
   currentEmail = email;
   document.getElementById('login-msg').textContent = '전송 중…';
-  const { error } = await sb.auth.signInWithOtp({ email });
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: window.location.href }
+  });
   if (error) {
     document.getElementById('login-msg').textContent = '오류: ' + error.message;
     return;
   }
   document.getElementById('login-msg').textContent = '';
   document.getElementById('login-email-step').style.display = 'none';
-  document.getElementById('login-otp-step').style.display = 'block';
-}
-
-async function verifyOtp() {
-  const token = document.getElementById('login-otp').value.trim();
-  if (!token) return;
-  const { error } = await sb.auth.verifyOtp({ email: currentEmail, token, type: 'email' });
-  if (error) {
-    document.getElementById('login-otp-msg').textContent = '코드가 올바르지 않습니다.';
-  }
+  document.getElementById('login-sent-step').style.display = 'block';
 }
 
 function backToEmail() {
-  document.getElementById('login-otp-step').style.display = 'none';
+  document.getElementById('login-sent-step').style.display = 'none';
   document.getElementById('login-email-step').style.display = 'block';
-  document.getElementById('login-otp-msg').textContent = '';
 }
 
 async function logout() {
