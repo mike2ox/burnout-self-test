@@ -633,13 +633,49 @@ nav .wrap {
   <div class="wrap">
     <span class="nav-logo">번아웃 체크</span>
     <span class="nav-badge">MBI-GS · WHO ICD-11</span>
+    <button id="btn-logout" style="display:none;" class="btn-ghost" onclick="logout()"
+            style="font-size:12px;padding:6px 14px;">로그아웃</button>
   </div>
 </nav>
 
 <!-- ═══════════════════════════════════════
+     PHASE 0 — LOGIN
+════════════════════════════════════════ -->
+<div class="phase active" id="phase-login">
+  <div class="wrap">
+    <section class="hero">
+      <span class="hero-eyebrow">인증</span>
+      <h1>나의 기록을 보려면<br><em>로그인이 필요합니다</em></h1>
+      <p class="hero-sub">이메일로 6자리 인증 코드를 받아 로그인하세요.</p>
+
+      <div id="login-email-step" style="max-width:360px;margin:0 auto;">
+        <div class="input-row">
+          <input type="email" id="login-email" placeholder="이메일 주소" />
+          <button onclick="sendOtp()">코드 받기</button>
+        </div>
+        <p id="login-msg" style="font-size:12px;color:var(--text3);margin-top:10px;min-height:18px;"></p>
+      </div>
+
+      <div id="login-otp-step" style="display:none;max-width:360px;margin:0 auto;">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">
+          이메일로 전송된 6자리 코드를 입력하세요.
+        </p>
+        <div class="input-row">
+          <input type="text" id="login-otp" placeholder="123456" maxlength="6"
+                 inputmode="numeric" pattern="[0-9]*" />
+          <button onclick="verifyOtp()">로그인</button>
+        </div>
+        <p id="login-otp-msg" style="font-size:12px;color:var(--red-text);margin-top:10px;min-height:18px;"></p>
+        <button class="btn-ghost" style="margin-top:12px;" onclick="backToEmail()">← 이메일 다시 입력</button>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
      PHASE 1 — INTRO
 ════════════════════════════════════════ -->
-<div class="phase active" id="phase-intro">
+<div class="phase" id="phase-intro">
   <div class="wrap">
     <section class="hero">
       <span class="hero-eyebrow">근거 기반 번아웃 자가 측정</span>
@@ -910,6 +946,62 @@ const REMEDIES = [
 let answers = new Array(15).fill(null);
 let current = 0;
 let myMethods = [];
+let currentEmail = '';
+
+/* ── AUTH ── */
+async function initAuth() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    onSignedIn();
+  } else {
+    showPhase('phase-login');
+  }
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN') onSignedIn();
+    if (event === 'SIGNED_OUT') { myMethods = []; showPhase('phase-login'); }
+  });
+}
+
+function onSignedIn() {
+  document.getElementById('btn-logout').style.display = 'block';
+  showPhase('phase-intro');
+  loadMethods();
+}
+
+async function sendOtp() {
+  const email = document.getElementById('login-email').value.trim();
+  if (!email) return;
+  currentEmail = email;
+  document.getElementById('login-msg').textContent = '전송 중…';
+  const { error } = await sb.auth.signInWithOtp({ email });
+  if (error) {
+    document.getElementById('login-msg').textContent = '오류: ' + error.message;
+    return;
+  }
+  document.getElementById('login-msg').textContent = '';
+  document.getElementById('login-email-step').style.display = 'none';
+  document.getElementById('login-otp-step').style.display = 'block';
+}
+
+async function verifyOtp() {
+  const token = document.getElementById('login-otp').value.trim();
+  if (!token) return;
+  const { error } = await sb.auth.verifyOtp({ email: currentEmail, token, type: 'email' });
+  if (error) {
+    document.getElementById('login-otp-msg').textContent = '코드가 올바르지 않습니다.';
+  }
+}
+
+function backToEmail() {
+  document.getElementById('login-otp-step').style.display = 'none';
+  document.getElementById('login-email-step').style.display = 'block';
+  document.getElementById('login-otp-msg').textContent = '';
+}
+
+async function logout() {
+  await sb.auth.signOut();
+  document.getElementById('btn-logout').style.display = 'none';
+}
 
 /* ── UTILS ── */
 function escapeHtml(str) {
@@ -1272,7 +1364,7 @@ document.addEventListener('keydown', e => {
   }
 });
 
-document.addEventListener('DOMContentLoaded', loadMethods);
+document.addEventListener('DOMContentLoaded', initAuth);
 </script>
 </body>
 </html>
