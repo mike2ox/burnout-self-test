@@ -1,0 +1,40 @@
+.item { margin-bottom: 20px; }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+
+.name { font-size: 13px; color: var(--text2); }
+
+.value {
+  font-size: 20px;
+  font-weight: 500;
+  font-family: 'Noto Serif KR', serif;
+}
+
+.ex .value { color: var(--amber-text); }
+.cy .value { color: var(--red-text); }
+.ef .value { color: var(--teal-text); }
+
+.track {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: 3px;
+  width: 0%;
+  transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ex .fill { background: var(--amber-text); }
+.cy .fill { background: var(--red-text); }
+.ef .fill { background: var(--teal-text); }
+
+.sub { font-size: 11px; color: var(--text3); margin-top: 5px; }

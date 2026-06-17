@@ -1,0 +1,41 @@
+.list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; min-height: 20px; }
+
+.empty { font-size: 13px; color: var(--text3); padding: 8px 0; }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+
+.text { flex: 1; font-size: 13px; color: var(--text); }
+
+.del {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.1s;
+}
+.del:hover { color: var(--red-text); }

@@ -1,0 +1,16 @@
+.submitting {
+  padding: 80px 0;
+  text-align: center;
+  font-size: 14px;
+  color: var(--text2);
+}
+
+.error {
+  font-size: 13px;
+  color: var(--red-text);
+  background: var(--red-dim);
+  border: 1px solid rgba(139,58,58,0.35);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  margin-bottom: 20px;
+}

@@ -1,0 +1,38 @@
+.loading { font-size: 13px; color: var(--text3); padding: 40px 0; }
+
+.secHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.secTitle {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.secBadge {
+  font-size: 11px;
+  color: var(--text3);
+  border: 1px solid var(--line);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+.box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.intro {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+  line-height: 1.7;
+}

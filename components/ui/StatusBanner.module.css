@@ -1,0 +1,32 @@
+.banner {
+  border-radius: var(--r);
+  padding: 24px 28px;
+  margin-bottom: 36px;
+  border: 1px solid;
+}
+
+.safe   { background: var(--teal-dim);  border-color: rgba(74,124,107,0.35); }
+.risk   { background: var(--amber-dim); border-color: rgba(168,115,64,0.35); }
+.burnout{ background: var(--red-dim);   border-color: rgba(139,58,58,0.35); }
+
+.label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.safe    .label { color: var(--teal-text); }
+.risk    .label { color: var(--amber-text); }
+.burnout .label { color: var(--red-text); }
+
+.title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.safe    .title { color: #a8dbc9; }
+.risk    .title { color: #e4bf8a; }
+.burnout .title { color: #e09090; }
+
+.desc { font-size: 13px; color: var(--text2); line-height: 1.75; }

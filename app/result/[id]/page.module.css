@@ -1,0 +1,27 @@
+.date {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  margin-bottom: 32px;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 40px 0;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.footnote {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.8;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}

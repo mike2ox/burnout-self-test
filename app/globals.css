@@ -1,0 +1,66 @@
+/* ── DESIGN TOKENS ── */
+:root {
+  --bg:        #0f1117;
+  --surface:   #181c26;
+  --surface2:  #1f2435;
+  --line:      rgba(255,255,255,0.08);
+  --line2:     rgba(255,255,255,0.14);
+  --text:      #f0ebe3;
+  --text2:     #9a9590;
+  --text3:     #5e5c58;
+  --gold:      #c8a97e;
+  --gold-dim:  rgba(200,169,126,0.12);
+  --teal:      #4a7c6b;
+  --teal-dim:  rgba(74,124,107,0.15);
+  --teal-text: #7bb8a5;
+  --red:       #8b3a3a;
+  --red-dim:   rgba(139,58,58,0.15);
+  --red-text:  #c47a7a;
+  --amber:     #a87340;
+  --amber-dim: rgba(168,115,64,0.15);
+  --amber-text:#d4a06a;
+  --r:     10px;
+  --r-sm:  6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 40px 0;
+}
+
+/* ── FADE IN ── */
+@keyframes phaseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.pageIn {
+  animation: phaseIn 0.35s ease both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, .pageIn { transition: none !important; animation: none !important; }
+}

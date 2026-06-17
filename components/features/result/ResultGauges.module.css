@@ -1,0 +1,9 @@
+.section { margin-bottom: 40px; }
+
+.label {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
