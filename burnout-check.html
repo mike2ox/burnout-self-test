@@ -1,0 +1,1278 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>번아웃 자가 측정 — MBI-GS 기반</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600&family=Noto+Sans+KR:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg:        #0F1117;
+  --surface:   #181C26;
+  --surface2:  #1F2435;
+  --line:      rgba(255,255,255,0.08);
+  --line2:     rgba(255,255,255,0.14);
+  --text:      #F0EBE3;
+  --text2:     #9A9590;
+  --text3:     #5E5C58;
+  --gold:      #C8A97E;
+  --gold-dim:  rgba(200,169,126,0.12);
+  --teal:      #4A7C6B;
+  --teal-dim:  rgba(74,124,107,0.15);
+  --teal-text: #7BB8A5;
+  --red:       #8B3A3A;
+  --red-dim:   rgba(139,58,58,0.15);
+  --red-text:  #C47A7A;
+  --amber:     #A87340;
+  --amber-dim: rgba(168,115,64,0.15);
+  --amber-text:#D4A06A;
+  --r: 10px;
+  --r-sm: 6px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 300;
+  font-size: 15px;
+  line-height: 1.75;
+  min-height: 100vh;
+}
+
+/* ── LAYOUT ── */
+.wrap {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── PHASES ── */
+.phase { display: none; }
+.phase.active { display: block; }
+
+/* ── NAV BAR ── */
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(15,17,23,0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  padding: 14px 0;
+}
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.nav-logo {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.02em;
+}
+.nav-badge {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.05em;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 80px 0 64px;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  border: 1px solid rgba(200,169,126,0.3);
+  padding: 5px 16px;
+  border-radius: 40px;
+  margin-bottom: 28px;
+  text-transform: uppercase;
+}
+.hero h1 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: clamp(28px, 5vw, 40px);
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 20px;
+  letter-spacing: -0.01em;
+}
+.hero h1 em {
+  font-style: normal;
+  color: var(--gold);
+}
+.hero-sub {
+  font-size: 14px;
+  color: var(--text2);
+  max-width: 440px;
+  margin: 0 auto 40px;
+  line-height: 1.8;
+}
+
+/* ── DIM CARDS ── */
+.dim-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 40px;
+}
+.dim-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 20px 16px;
+  text-align: left;
+}
+.dim-card .dc-icon {
+  font-size: 22px;
+  margin-bottom: 12px;
+  display: block;
+}
+.dim-card .dc-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.dim-card .dc-desc {
+  font-size: 12px;
+  color: var(--text2);
+  line-height: 1.6;
+}
+.dc-ex .dc-icon { color: var(--amber-text); }
+.dc-cy .dc-icon { color: var(--red-text); }
+.dc-ef .dc-icon { color: var(--teal-text); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  display: inline-block;
+  background: var(--gold);
+  color: #0F1117;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 14px 40px;
+  border-radius: 40px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+
+.btn-ghost {
+  display: inline-block;
+  background: transparent;
+  color: var(--text2);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+  padding: 11px 28px;
+  border-radius: 40px;
+  border: 1px solid var(--line2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+/* ── BASIS NOTE ── */
+.basis-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+  justify-content: center;
+}
+.basis-chip {
+  font-size: 11px;
+  color: var(--text3);
+  border: 1px solid var(--line);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+/* ── SURVEY ── */
+#phase-survey { padding-top: 40px; padding-bottom: 80px; }
+.progress-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.progress-count { font-size: 12px; color: var(--text3); }
+.progress-tag {
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.04em;
+}
+.tag-ex { background: var(--amber-dim); color: var(--amber-text); }
+.tag-cy { background: var(--red-dim);   color: var(--red-text); }
+.tag-ef { background: var(--teal-dim);  color: var(--teal-text); }
+
+.progress-track {
+  height: 2px;
+  background: var(--line);
+  border-radius: 2px;
+  margin-bottom: 36px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+
+.q-block { margin-bottom: 32px; }
+.q-num { font-size: 11px; color: var(--text3); margin-bottom: 14px; letter-spacing: 0.06em; }
+.q-text {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 28px;
+}
+
+.scale-list { display: flex; flex-direction: column; gap: 8px; }
+.scale-opt {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 13px 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.scale-opt:hover { border-color: var(--line2); background: var(--surface2); }
+.scale-opt.selected {
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+.scale-opt .so-num {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text3);
+  min-width: 18px;
+  text-align: center;
+}
+.scale-opt.selected .so-num { color: var(--gold); }
+.scale-opt .so-label { font-size: 13px; color: var(--text2); }
+.scale-opt.selected .so-label { color: var(--text); }
+
+.nav-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+}
+.nav-btns .btn-ghost { flex: 0 0 auto; }
+.nav-btns .btn-next {
+  flex: 1;
+  background: var(--gold);
+  color: #0F1117;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 13px;
+  border-radius: var(--r);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+  text-align: center;
+}
+.nav-btns .btn-next:disabled { opacity: 0.25; cursor: not-allowed; }
+.nav-btns .btn-next:not(:disabled):hover { opacity: 0.88; }
+
+/* ── RESULT ── */
+#phase-result { padding-top: 48px; padding-bottom: 80px; }
+.result-date {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.06em;
+  margin-bottom: 32px;
+}
+
+/* ── STATUS BANNER ── */
+.status-banner {
+  border-radius: var(--r);
+  padding: 24px 28px;
+  margin-bottom: 36px;
+  border: 1px solid;
+}
+.status-safe   { background: var(--teal-dim);  border-color: rgba(74,124,107,0.35); }
+.status-risk   { background: var(--amber-dim); border-color: rgba(168,115,64,0.35); }
+.status-burnout{ background: var(--red-dim);   border-color: rgba(139,58,58,0.35); }
+
+.status-banner .sb-label {
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.status-safe    .sb-label { color: var(--teal-text); }
+.status-risk    .sb-label { color: var(--amber-text); }
+.status-burnout .sb-label { color: var(--red-text); }
+
+.status-banner .sb-title {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.status-safe    .sb-title { color: #A8DBC9; }
+.status-risk    .sb-title { color: #E4BF8A; }
+.status-burnout .sb-title { color: #E09090; }
+
+.status-banner .sb-desc { font-size: 13px; color: var(--text2); line-height: 1.75; }
+
+/* ── GAUGE BARS (signature element) ── */
+.gauge-section { margin-bottom: 40px; }
+.gauge-label-row {
+  font-size: 11px;
+  color: var(--text3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.gauge-item { margin-bottom: 20px; }
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+}
+.gauge-name { font-size: 13px; color: var(--text2); }
+.gauge-value { font-size: 20px; font-weight: 500; font-family: 'Noto Serif KR', serif; }
+.gauge-ex .gauge-value { color: var(--amber-text); }
+.gauge-cy .gauge-value { color: var(--red-text); }
+.gauge-ef .gauge-value { color: var(--teal-text); }
+.gauge-track {
+  height: 6px;
+  background: var(--line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.gauge-fill {
+  height: 100%;
+  border-radius: 3px;
+  width: 0%;
+  transition: width 1s cubic-bezier(0.4,0,0.2,1);
+}
+.gauge-ex .gauge-fill { background: var(--amber-text); }
+.gauge-cy .gauge-fill { background: var(--red-text); }
+.gauge-ef .gauge-fill { background: var(--teal-text); }
+.gauge-sub { font-size: 11px; color: var(--text3); margin-top: 5px; }
+
+/* ── DIVIDER ── */
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 40px 0;
+}
+
+/* ── SECTION HEADER ── */
+.sec-header {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.sec-header h2 {
+  font-family: 'Noto Serif KR', serif;
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+}
+.sec-header .sec-badge {
+  font-size: 11px;
+  color: var(--text3);
+  border: 1px solid var(--line);
+  padding: 3px 10px;
+  border-radius: 20px;
+}
+
+/* ── REMEDY CARDS ── */
+.remedy-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+.remedy-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 18px 20px;
+}
+.remedy-card .rc-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: rgba(74,124,107,0.15);
+  color: var(--teal-text);
+  margin-bottom: 10px;
+}
+.remedy-card h3 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.remedy-card p {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.7;
+}
+
+/* ── PERSONAL METHODS ── */
+.personal-box {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 24px;
+  margin-bottom: 16px;
+}
+.personal-box .pb-intro {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 20px;
+  line-height: 1.7;
+}
+.methods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 16px;
+  min-height: 20px;
+}
+.method-empty {
+  font-size: 13px;
+  color: var(--text3);
+  padding: 8px 0;
+}
+.method-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--surface2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px 14px;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.method-item .mi-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  flex-shrink: 0;
+}
+.method-item .mi-text { flex: 1; font-size: 13px; color: var(--text); }
+.method-item .mi-del {
+  background: none;
+  border: none;
+  color: var(--text3);
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.1s;
+}
+.method-item .mi-del:hover { color: var(--red-text); }
+.input-row {
+  display: flex;
+  gap: 8px;
+}
+.input-row input {
+  flex: 1;
+  background: var(--bg);
+  border: 1px solid var(--line2);
+  border-radius: var(--r-sm);
+  padding: 11px 14px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input-row input::placeholder { color: var(--text3); }
+.input-row input:focus { border-color: var(--gold); }
+.input-row button {
+  background: var(--surface2);
+  border: 1px solid var(--line2);
+  border-radius: var(--r-sm);
+  color: var(--text);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  padding: 11px 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.input-row button:hover { background: var(--gold-dim); border-color: rgba(200,169,126,0.35); color: var(--gold); }
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 14px;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--line2);
+  border-radius: var(--r-sm);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.export-btn:hover { background: var(--surface2); color: var(--text); }
+.export-btn svg { flex-shrink: 0; }
+
+/* ── BOTTOM ACTIONS ── */
+.bottom-actions {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 40px;
+}
+.bottom-actions .btn-primary { flex: 1; border-radius: var(--r); padding: 14px; }
+.bottom-actions .btn-ghost { flex: 0 0 auto; padding: 14px 20px; border-radius: var(--r); }
+
+/* ── FOOTNOTE ── */
+.footnote {
+  font-size: 11px;
+  color: var(--text3);
+  line-height: 1.8;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.footnote a { color: var(--text3); text-decoration: underline; text-underline-offset: 2px; }
+
+/* ── FADE IN animation for phases ── */
+.phase.active {
+  display: block;
+  animation: phaseIn 0.35s ease both;
+}
+@keyframes phaseIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 480px) {
+  .dim-grid { grid-template-columns: 1fr; gap: 8px; }
+  .hero { padding: 56px 0 48px; }
+  .hero h1 { font-size: 26px; }
+  .q-text { font-size: 17px; }
+  .bottom-actions { flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, .gauge-fill, .progress-fill { transition: none !important; animation: none !important; }
+}
+
+/* ── HISTORY SECTION ── */
+.history-item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+.hi-date { font-size: 11px; color: var(--text3); min-width: 88px; }
+.hi-scores { flex: 1; display: flex; gap: 14px; flex-wrap: wrap; }
+.hi-score { font-size: 12px; color: var(--text2); }
+.hi-score b { color: var(--text); font-weight: 500; }
+.status-chip { font-size: 10px; padding: 3px 10px; border-radius: 20px; white-space: nowrap; }
+.chip-safe    { background: var(--teal-dim);  color: var(--teal-text); }
+.chip-risk    { background: var(--amber-dim); color: var(--amber-text); }
+.chip-burnout { background: var(--red-dim);   color: var(--red-text); }
+.hi-del {
+  background: none; border: none; color: var(--text3);
+  cursor: pointer; font-size: 17px; line-height: 1; padding: 0 2px;
+  transition: color 0.1s; flex-shrink: 0;
+}
+.hi-del:hover { color: var(--red-text); }
+
+/* ── IMPORT BUTTON ── */
+.import-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; margin-bottom: 14px; padding: 11px;
+  background: transparent; border: 1px dashed var(--line2);
+  border-radius: var(--r-sm); font-family: 'Noto Sans KR', sans-serif;
+  font-size: 13px; color: var(--text2); cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.import-btn:hover { background: var(--surface2); color: var(--text); border-color: rgba(200,169,126,0.4); }
+.import-notice { font-size: 12px; margin-bottom: 10px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="wrap">
+    <span class="nav-logo">번아웃 체크</span>
+    <span class="nav-badge">MBI-GS · WHO ICD-11</span>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════
+     PHASE 1 — INTRO
+════════════════════════════════════════ -->
+<div class="phase active" id="phase-intro">
+  <div class="wrap">
+    <section class="hero">
+      <span class="hero-eyebrow">근거 기반 번아웃 자가 측정</span>
+      <h1>지금 나의 에너지는<br><em>얼마나 남아 있을까</em></h1>
+      <p class="hero-sub">
+        Christina Maslach의 MBI-GS를 기반으로 소진·냉소·효능감을 측정합니다.
+        15개 문항, 약 5분 소요됩니다.
+      </p>
+
+      <div class="dim-grid">
+        <div class="dim-card dc-ex">
+          <span class="dc-icon">⚡</span>
+          <div class="dc-name">소진 Exhaustion</div>
+          <div class="dc-desc">일로 인해 에너지가 고갈되고 만성적으로 피로한 상태</div>
+        </div>
+        <div class="dim-card dc-cy">
+          <span class="dc-icon">🌫</span>
+          <div class="dc-name">냉소 Cynicism</div>
+          <div class="dc-desc">업무에 대한 무관심, 거리감, 의욕 저하</div>
+        </div>
+        <div class="dim-card dc-ef">
+          <span class="dc-icon">🌱</span>
+          <div class="dc-name">효능감 Efficacy</div>
+          <div class="dc-desc">일을 잘 해낼 수 있다는 자신감과 성취감</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="startSurvey()">측정 시작하기 →</button>
+
+      <div class="basis-row">
+        <span class="basis-chip">Maslach et al., 1996</span>
+        <span class="basis-chip">40년간 수십 개국 검증</span>
+        <span class="basis-chip">WHO ICD-11 3차원 부합</span>
+      </div>
+    </section>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PHASE 2 — SURVEY
+════════════════════════════════════════ -->
+<div class="phase" id="phase-survey">
+  <div class="wrap">
+
+    <div class="progress-header">
+      <span class="progress-count" id="prog-count">1 / 15</span>
+      <span class="progress-tag" id="dim-tag">소진</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="prog-fill" style="width: 6.6%;"></div>
+    </div>
+
+    <div class="q-block">
+      <div class="q-num" id="q-num">문항 01</div>
+      <div class="q-text" id="q-text">문항이 로딩됩니다.</div>
+      <div class="scale-list" id="scale-list"></div>
+    </div>
+
+    <div class="nav-btns">
+      <button class="btn-ghost" id="btn-prev" onclick="prevQ()">← 이전</button>
+      <button class="btn-next" id="btn-next" onclick="nextQ()" disabled>다음 →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     PHASE 3 — RESULT
+════════════════════════════════════════ -->
+<div class="phase" id="phase-result">
+  <div class="wrap">
+
+    <p class="result-date" id="result-date"></p>
+
+    <!-- Status banner -->
+    <div class="status-banner" id="status-banner">
+      <div class="sb-label" id="sb-label"></div>
+      <div class="sb-title" id="sb-title"></div>
+      <div class="sb-desc"  id="sb-desc"></div>
+    </div>
+
+    <!-- Gauge bars -->
+    <div class="gauge-section">
+      <div class="gauge-label-row">차원별 점수 · 0–4점 척도</div>
+
+      <div class="gauge-item gauge-ex">
+        <div class="gauge-header">
+          <span class="gauge-name">소진 (Exhaustion)</span>
+          <span class="gauge-value" id="gv-ex">—</span>
+        </div>
+        <div class="gauge-track"><div class="gauge-fill" id="gf-ex"></div></div>
+        <div class="gauge-sub" id="gs-ex"></div>
+      </div>
+
+      <div class="gauge-item gauge-cy">
+        <div class="gauge-header">
+          <span class="gauge-name">냉소 (Cynicism)</span>
+          <span class="gauge-value" id="gv-cy">—</span>
+        </div>
+        <div class="gauge-track"><div class="gauge-fill" id="gf-cy"></div></div>
+        <div class="gauge-sub" id="gs-cy"></div>
+      </div>
+
+      <div class="gauge-item gauge-ef">
+        <div class="gauge-header">
+          <span class="gauge-name">효능감 (Efficacy)</span>
+          <span class="gauge-value" id="gv-ef">—</span>
+        </div>
+        <div class="gauge-track"><div class="gauge-fill" id="gf-ef"></div></div>
+        <div class="gauge-sub" id="gs-ef"></div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Evidence-based remedies (shown when at-risk or burnout) -->
+    <div id="remedy-section" style="display:none;">
+      <div class="sec-header">
+        <h2>근거 기반 회복 방법</h2>
+        <span class="sec-badge">메타분석·RCT 지지</span>
+      </div>
+      <div class="remedy-list" id="remedy-list"></div>
+      <div class="divider"></div>
+    </div>
+
+    <!-- Personal methods -->
+    <div class="sec-header">
+      <h2>나만의 탈출 방법</h2>
+      <span class="sec-badge">별도 파일 저장 가능</span>
+    </div>
+    <div class="personal-box">
+      <p class="pb-intro">
+        본인에게 효과가 있었던 방법을 기록해두세요.
+        기존 <code>.txt</code> 파일에서 불러오거나, 아래 "파일로 저장"으로 내보낼 수 있습니다.
+      </p>
+      <button class="import-btn" onclick="triggerFileImport()">
+        ↑ 기존 .txt 파일에서 불러오기
+      </button>
+      <input type="file" id="file-import" accept=".txt" style="display:none" onchange="importFromFile(event)">
+      <div class="methods-list" id="methods-list">
+        <span class="method-empty">아직 기록된 방법이 없습니다.</span>
+      </div>
+      <div class="input-row">
+        <input type="text" id="method-input"
+               placeholder="예: 주 2회 저녁 달리기 30분" maxlength="80" />
+        <button onclick="addMethod()">+ 추가</button>
+      </div>
+      <button class="export-btn" onclick="exportMethods()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        텍스트 파일로 저장하기
+      </button>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Bottom actions -->
+    <div class="bottom-actions">
+      <button class="btn-primary" onclick="restart()">다시 측정하기</button>
+      <button class="btn-ghost" onclick="showIntro()">처음으로</button>
+    </div>
+
+    <!-- 측정 기록 -->
+    <div id="history-section" style="display:none;">
+      <div class="divider"></div>
+      <div class="sec-header">
+        <h2>측정 기록</h2>
+        <span class="sec-badge" id="history-count"></span>
+      </div>
+      <div id="history-list"></div>
+      <button class="btn-ghost" style="width:100%;margin-top:8px;border-radius:var(--r);" onclick="clearAllHistory()">전체 기록 삭제</button>
+    </div>
+
+    <p class="footnote">
+      이 도구는 Maslach, C., Jackson, S.E., &amp; Leiter, M.P.(1996)의
+      <em>MBI-GS(Maslach Burnout Inventory — General Survey)</em>를 기반으로 합니다.
+      0–4점 5점 척도를 사용하며, 소진·냉소는 높을수록 번아웃, 효능감은 낮을수록 번아웃을 나타냅니다.
+      본 도구는 임상 진단 도구가 아니며 전문 상담을 대체하지 않습니다.
+      번아웃 상태가 지속된다면 전문가 상담을 권장합니다.
+    </p>
+
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     SCRIPT
+═══════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ── SUPABASE ── */
+const { createClient } = supabase;
+const sb = createClient(
+  'https://zwpcfwlkpighrwjohjho.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp3cGNmd2xrcGlnaHJ3am9oamhvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE2NzY4MTMsImV4cCI6MjA5NzI1MjgxM30.yiUGW-Wh68jhZJ-Z-6GU3fQ-j4OEKweVG58pJozS12k'
+);
+
+/* ── DATA ── */
+const QUESTIONS = [
+  { dim: 'ex', text: '일을 마치고 나면 완전히 지쳐버린다는 느낌이 든다.' },
+  { dim: 'ex', text: '퇴근할 때쯤 되면 녹초가 된 느낌이다.' },
+  { dim: 'ex', text: '아침에 일어나 또 하루 일을 시작해야 한다는 생각이 피곤하다.' },
+  { dim: 'ex', text: '하루 종일 일하는 것이 나에게 부담이 된다.' },
+  { dim: 'ex', text: '직장에서 일하는 것에 완전히 지쳐있다.' },
+  { dim: 'cy', text: '내 일의 의미에 대해 예전보다 덜 관심을 갖게 되었다.' },
+  { dim: 'cy', text: '내 일이 정말 가치 있는 것인지 회의적으로 느껴진다.' },
+  { dim: 'cy', text: '내가 하는 일이 조직이나 사회에 기여하는지 의구심이 든다.' },
+  { dim: 'cy', text: '일에 열정적으로 임했던 때를 더 이상 기억하기 어렵다.' },
+  { dim: 'cy', text: '직장에서 내가 하는 일이 나에게 별 의미가 없다고 느낀다.' },
+  { dim: 'ef', text: '내가 하는 일에서 생기는 문제를 효과적으로 해결할 수 있다.' },
+  { dim: 'ef', text: '내 직업 분야에서 가치 있는 성과를 내고 있다고 느낀다.' },
+  { dim: 'ef', text: '내 일을 잘 해낼 수 있다는 자신감이 있다.' },
+  { dim: 'ef', text: '나는 일을 하면서 많은 것을 성취하고 있다.' },
+  { dim: 'ef', text: '무언가를 해냈을 때 진심으로 기쁨을 느낀다.' },
+];
+
+const SCALE = [
+  { val: 0, label: '전혀 없음' },
+  { val: 1, label: '아주 드물게 — 연 몇 차례 정도' },
+  { val: 2, label: '가끔 — 월 1회 정도' },
+  { val: 3, label: '자주 — 주 1회 정도' },
+  { val: 4, label: '매우 자주 — 매일 혹은 거의 매일' },
+];
+
+const DIM_META = {
+  ex: { label: '소진', cls: 'tag-ex' },
+  cy: { label: '냉소', cls: 'tag-cy' },
+  ef: { label: '효능감', cls: 'tag-ef' },
+};
+
+const REMEDIES = [
+  {
+    badge: 'RCT 메타분석 · 최강 근거',
+    title: '마음챙김 기반 스트레스 감소(MBSR)',
+    desc: '8주 과정의 MBSR 또는 일상적 마음챙김 명상(하루 10–20분)이 소진과 냉소를 유의미하게 줄인다는 것이 무작위 대조 연구(RCT) 다수에서 확인되었습니다. 앱(예: Headspace, Calm)을 활용한 디지털 마음챙김도 동등한 효과가 보고됩니다.'
+  },
+  {
+    badge: '체계적 문헌고찰 근거',
+    title: '인지행동치료(CBT) 기반 사고 재구조화',
+    desc: '비합리적 완벽주의 신념과 반추적 사고 패턴을 바꾸는 인지 재구조화가 냉소 감소와 효능감 회복에 효과적임이 체계적 문헌고찰로 입증되었습니다. "나는 완벽해야 한다"를 "나는 충분히 잘 하고 있다"로 전환하는 연습이 핵심입니다.'
+  },
+  {
+    badge: '직업 건강 심리학 · 강한 근거',
+    title: '심리적 분리 (Psychological Detachment)',
+    desc: '퇴근 후 업무와 완전히 단절하는 시간을 확보하는 것이 소진 회복의 핵심입니다. 업무 알림 끄기, 퇴근 후 기기 덮어두기, "오프 루틴" 설계가 도움이 됩니다. 연구에 따르면 심리적 분리가 높은 사람은 수면의 질도 높습니다.'
+  },
+  {
+    badge: '임상 연구 다수 지지',
+    title: '규칙적인 유산소 운동',
+    desc: '주 3회 이상, 중강도 유산소 운동 30분이 코르티솔 수치를 낮추고 정서적 소진을 감소시킵니다. 거창하지 않아도 됩니다. 빠른 걷기, 자전거, 수영 모두 유효합니다. 번아웃 직접 개입 연구에서 운동의 효과가 반복 확인되었습니다.'
+  },
+  {
+    badge: '번아웃 보호 요인 연구',
+    title: '사회적 지지망 회복',
+    desc: '신뢰할 수 있는 동료·친구와의 연결이 번아웃의 가장 강력한 완충 요인 중 하나입니다. 고립감이 심화되면 소진이 빠르게 악화됩니다. 의식적으로 교류를 늘리고, 혼자 해결하려는 충동을 줄이세요.'
+  },
+  {
+    badge: 'JD-R 모형 · 직무요구-자원',
+    title: '잡 크래프팅 (Job Crafting)',
+    desc: 'Bakker & Demerouti의 직무요구-자원(JD-R) 모형에 따르면, 업무 내 자율성·의미·성장 기회를 스스로 재설계하는 잡 크래프팅이 번아웃 예방과 회복에 효과적입니다. 작은 업무 범위라도 스스로 조율할 수 있는 여지를 찾으세요.'
+  },
+];
+
+/* ── STATE ── */
+let answers = new Array(15).fill(null);
+let current = 0;
+let myMethods = [];
+
+/* ── UTILS ── */
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ── PHASE NAVIGATION ── */
+function showPhase(id) {
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showIntro()  { showPhase('phase-intro'); }
+
+function startSurvey() {
+  answers = new Array(15).fill(null);
+  current = 0;
+  showPhase('phase-survey');
+  renderQ();
+}
+
+function restart() { startSurvey(); }
+
+/* ── SURVEY LOGIC ── */
+function renderQ() {
+  const q = QUESTIONS[current];
+  const idx = current + 1;
+  const total = QUESTIONS.length;
+
+  document.getElementById('prog-count').textContent = idx + ' / ' + total;
+  document.getElementById('prog-fill').style.width = Math.round((idx / total) * 100) + '%';
+
+  const tag = document.getElementById('dim-tag');
+  tag.textContent = DIM_META[q.dim].label;
+  tag.className = 'progress-tag ' + DIM_META[q.dim].cls;
+
+  document.getElementById('q-num').textContent = '문항 ' + String(idx).padStart(2, '0');
+  document.getElementById('q-text').textContent = q.text;
+
+  const list = document.getElementById('scale-list');
+  list.innerHTML = '';
+  SCALE.forEach(s => {
+    const opt = document.createElement('div');
+    opt.className = 'scale-opt' + (answers[current] === s.val ? ' selected' : '');
+    opt.innerHTML =
+      '<span class="so-num">' + s.val + '</span>' +
+      '<span class="so-label">' + s.label + '</span>';
+    opt.addEventListener('click', () => {
+      answers[current] = s.val;
+      renderQ();
+    });
+    list.appendChild(opt);
+  });
+
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  btnPrev.disabled = (current === 0);
+  btnNext.disabled = (answers[current] === null);
+  btnNext.textContent = (current === total - 1) ? '결과 보기 →' : '다음 →';
+}
+
+function prevQ() {
+  if (current > 0) { current--; renderQ(); }
+}
+
+function nextQ() {
+  if (answers[current] === null) return;
+  if (current < QUESTIONS.length - 1) {
+    current++;
+    renderQ();
+  } else {
+    computeAndShowResult();
+  }
+}
+
+/* ── RESULT LOGIC ── */
+function avg(indices) {
+  return indices.reduce((s, i) => s + answers[i], 0) / indices.length;
+}
+
+async function computeAndShowResult() {
+  const exIdx = QUESTIONS.map((q, i) => q.dim === 'ex' ? i : -1).filter(i => i >= 0);
+  const cyIdx = QUESTIONS.map((q, i) => q.dim === 'cy' ? i : -1).filter(i => i >= 0);
+  const efIdx = QUESTIONS.map((q, i) => q.dim === 'ef' ? i : -1).filter(i => i >= 0);
+
+  const exScore = avg(exIdx);
+  const cyScore = avg(cyIdx);
+  const efScore = avg(efIdx);
+
+  /* ── Date ── */
+  const now = new Date();
+  document.getElementById('result-date').textContent =
+    now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 측정';
+
+  /* ── Status classification ── */
+  const burnout = (exScore >= 3.0 && cyScore >= 2.0) || exScore >= 3.5;
+  const risk    = !burnout && (exScore >= 2.0 || cyScore >= 1.5 || efScore <= 1.5);
+  const statusStr = burnout ? 'burnout' : risk ? 'risk' : 'safe';
+
+  const banner = document.getElementById('status-banner');
+  const sbLabel = document.getElementById('sb-label');
+  const sbTitle = document.getElementById('sb-title');
+  const sbDesc  = document.getElementById('sb-desc');
+
+  if (burnout) {
+    banner.className = 'status-banner status-burnout';
+    sbLabel.textContent = '주의 필요';
+    sbTitle.textContent = '번아웃 상태가 의심됩니다';
+    sbDesc.textContent  = '소진과 냉소가 높은 수준입니다. 지금 당장 의도적인 회복 조치가 필요합니다. 아래 근거 기반 방법들을 참고하고, 증상이 지속된다면 전문가 상담을 권장합니다.';
+  } else if (risk) {
+    banner.className = 'status-banner status-risk';
+    sbLabel.textContent = '경계 단계';
+    sbTitle.textContent = '번아웃 위험 신호가 감지됩니다';
+    sbDesc.textContent  = '아직 본격적인 번아웃은 아니지만, 소진이나 냉소 지표가 주의 수준에 있습니다. 지금 예방적으로 관리하는 것이 중요합니다.';
+  } else {
+    banner.className = 'status-banner status-safe';
+    sbLabel.textContent = '현재 양호';
+    sbTitle.textContent = '번아웃 징후가 뚜렷하지 않습니다';
+    sbDesc.textContent  = '소진과 냉소가 낮은 수준이며 효능감이 유지되고 있습니다. 현재의 패턴을 유지하고, 2–4주 간격으로 정기 점검하세요.';
+  }
+
+  /* ── Gauge values ── */
+  document.getElementById('gv-ex').textContent = exScore.toFixed(1);
+  document.getElementById('gv-cy').textContent = cyScore.toFixed(1);
+  document.getElementById('gv-ef').textContent = efScore.toFixed(1);
+
+  document.getElementById('gs-ex').textContent = exScore >= 3.0 ? '높음 — 에너지 고갈 징후' : exScore >= 2.0 ? '보통 — 관찰 필요' : '낮음 — 양호';
+  document.getElementById('gs-cy').textContent = cyScore >= 2.0 ? '높음 — 심리적 거리감 커짐' : cyScore >= 1.5 ? '보통 — 관찰 필요' : '낮음 — 양호';
+  document.getElementById('gs-ef').textContent = efScore <= 1.5 ? '낮음 — 효능감 저하 주의' : efScore <= 2.5 ? '보통 — 관찰 필요' : '높음 — 양호';
+
+  /* Animate after DOM paint */
+  showPhase('phase-result');
+  setTimeout(() => {
+    document.getElementById('gf-ex').style.width = Math.round((exScore / 4) * 100) + '%';
+    document.getElementById('gf-cy').style.width = Math.round((cyScore / 4) * 100) + '%';
+    /* Efficacy bar inverted: low score = high fill to show danger */
+    document.getElementById('gf-ef').style.width = Math.round((efScore / 4) * 100) + '%';
+  }, 80);
+
+  /* ── Remedies ── */
+  const remedySection = document.getElementById('remedy-section');
+  if (burnout || risk) {
+    remedySection.style.display = 'block';
+    const list = document.getElementById('remedy-list');
+    list.innerHTML = '';
+    REMEDIES.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'remedy-card';
+      card.innerHTML =
+        '<span class="rc-badge">' + r.badge + '</span>' +
+        '<h3>' + r.title + '</h3>' +
+        '<p>' + r.desc + '</p>';
+      list.appendChild(card);
+    });
+  } else {
+    remedySection.style.display = 'none';
+  }
+
+  renderMethods();
+  await saveHistory(exScore, cyScore, efScore, statusStr);
+  await loadHistory();
+}
+
+/* ── MY METHODS ── */
+async function loadMethods() {
+  const { data, error } = await sb.from('methods').select('*').order('created_at');
+  if (error) { console.error('methods load error:', error); return; }
+  myMethods = data || [];
+  renderMethods();
+}
+
+function renderMethods() {
+  const list = document.getElementById('methods-list');
+  if (myMethods.length === 0) {
+    list.innerHTML = '<span class="method-empty">아직 기록된 방법이 없습니다.</span>';
+    return;
+  }
+  list.innerHTML = '';
+  myMethods.forEach(m => {
+    const item = document.createElement('div');
+    item.className = 'method-item';
+    item.innerHTML =
+      '<span class="mi-dot"></span>' +
+      '<span class="mi-text">' + escapeHtml(m.text) + '</span>' +
+      '<button class="mi-del" onclick="deleteMethod(\'' + m.id + '\')" aria-label="삭제">×</button>';
+    list.appendChild(item);
+  });
+}
+
+async function addMethod() {
+  const input = document.getElementById('method-input');
+  const val = input.value.trim();
+  if (!val) return;
+  const { data, error } = await sb.from('methods').insert({ text: val }).select().single();
+  if (error) { console.error('method insert error:', error); return; }
+  myMethods.push(data);
+  input.value = '';
+  renderMethods();
+}
+
+async function deleteMethod(id) {
+  const { error } = await sb.from('methods').delete().eq('id', id);
+  if (error) { console.error('method delete error:', error); return; }
+  myMethods = myMethods.filter(m => m.id !== id);
+  renderMethods();
+}
+
+function triggerFileImport() {
+  document.getElementById('file-import').click();
+}
+
+async function importFromFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const text = await file.text();
+  const pattern = /^\d+\.\s+(.+)$/;
+  const existing = new Set(myMethods.map(m => m.text.trim()));
+  const newItems = [];
+  for (const line of text.split('\n')) {
+    const match = line.trim().match(pattern);
+    if (match) {
+      const val = match[1].trim();
+      if (!existing.has(val)) { newItems.push({ text: val }); existing.add(val); }
+    }
+  }
+  event.target.value = '';
+  if (newItems.length === 0) { showImportMsg('새로 추가할 항목이 없습니다.', false); return; }
+  const { data, error } = await sb.from('methods').insert(newItems).select();
+  if (error) { console.error('bulk insert error:', error); return; }
+  myMethods = myMethods.concat(data);
+  renderMethods();
+  showImportMsg(data.length + '개 항목을 불러왔습니다.', true);
+}
+
+function showImportMsg(msg, success) {
+  const old = document.getElementById('import-msg');
+  if (old) old.remove();
+  const el = document.createElement('div');
+  el.id = 'import-msg';
+  el.className = 'import-notice';
+  el.style.color = success ? 'var(--teal-text)' : 'var(--text3)';
+  el.textContent = (success ? '✓ ' : '') + msg;
+  document.querySelector('.import-btn').insertAdjacentElement('afterend', el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+function exportMethods() {
+  if (myMethods.length === 0) {
+    alert('저장된 방법이 없습니다.\n먼저 나만의 방법을 추가해주세요.');
+    return;
+  }
+  const now = new Date();
+  const dateStr =
+    now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0');
+
+  let text = '';
+  text += '나만의 번아웃 탈출 방법\n';
+  text += '작성일: ' + dateStr + '\n';
+  text += '━'.repeat(36) + '\n\n';
+  myMethods.forEach((m, i) => {
+    text += (i + 1) + '.  ' + m.text + '\n';
+  });
+  text += '\n' + '━'.repeat(36) + '\n';
+  text += '※ 번아웃 자가 측정 도구 (MBI-GS 기반) 에서 내보낸 기록입니다.\n';
+  text += '※ 근거 없이 이 파일의 정보를 임상 판단에 사용하지 마세요.\n';
+
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = '나만의_번아웃_탈출방법_' + dateStr + '.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ── HISTORY ── */
+async function saveHistory(ex, cy, ef, status) {
+  const { error } = await sb.from('history').insert({
+    ex_score: parseFloat(ex.toFixed(2)),
+    cy_score: parseFloat(cy.toFixed(2)),
+    ef_score: parseFloat(ef.toFixed(2)),
+    status
+  });
+  if (error) console.error('history insert error:', error);
+}
+
+async function loadHistory() {
+  const { data, error } = await sb.from('history').select('*').order('created_at', { ascending: false });
+  if (error) { console.error('history load error:', error); return; }
+  renderHistory(data || []);
+}
+
+function renderHistory(records) {
+  const section = document.getElementById('history-section');
+  const list    = document.getElementById('history-list');
+  const badge   = document.getElementById('history-count');
+  if (!records.length) { section.style.display = 'none'; return; }
+  section.style.display = 'block';
+  badge.textContent = records.length + '회';
+  const LABEL = { safe: '양호', risk: '경계', burnout: '번아웃' };
+  const CHIP  = { safe: 'chip-safe', risk: 'chip-risk', burnout: 'chip-burnout' };
+  list.innerHTML = '';
+  records.forEach(r => {
+    const d = new Date(r.created_at);
+    const dateStr =
+      d.getFullYear() + '.' +
+      String(d.getMonth() + 1).padStart(2, '0') + '.' +
+      String(d.getDate()).padStart(2, '0');
+    const item = document.createElement('div');
+    item.className = 'history-item';
+    item.innerHTML =
+      '<span class="hi-date">' + dateStr + '</span>' +
+      '<div class="hi-scores">' +
+        '<span class="hi-score">소진 <b>' + r.ex_score + '</b></span>' +
+        '<span class="hi-score">냉소 <b>' + r.cy_score + '</b></span>' +
+        '<span class="hi-score">효능감 <b>' + r.ef_score + '</b></span>' +
+      '</div>' +
+      '<span class="status-chip ' + CHIP[r.status] + '">' + LABEL[r.status] + '</span>' +
+      '<button class="hi-del" onclick="deleteHistory(\'' + r.id + '\')" aria-label="삭제">×</button>';
+    list.appendChild(item);
+  });
+}
+
+async function deleteHistory(id) {
+  const { error } = await sb.from('history').delete().eq('id', id);
+  if (error) { console.error('history delete error:', error); return; }
+  await loadHistory();
+}
+
+async function clearAllHistory() {
+  if (!confirm('모든 측정 기록을 삭제하시겠습니까?')) return;
+  const { error } = await sb.from('history').delete().neq('id', '00000000-0000-0000-0000-000000000000');
+  if (error) { console.error('history clear error:', error); return; }
+  renderHistory([]);
+}
+
+/* ── KEYBOARD ── */
+document.addEventListener('keydown', e => {
+  if (document.getElementById('phase-survey').classList.contains('active')) {
+    if (e.key === 'ArrowRight' || e.key === 'Enter') {
+      if (!document.getElementById('btn-next').disabled) nextQ();
+    }
+    if (e.key === 'ArrowLeft') {
+      if (!document.getElementById('btn-prev').disabled) prevQ();
+    }
+    // Number keys 0–4
+    const num = parseInt(e.key);
+    if (!isNaN(num) && num >= 0 && num <= 4) {
+      answers[current] = num;
+      renderQ();
+    }
+  }
+  if (e.key === 'Enter' && document.activeElement.id === 'method-input') {
+    addMethod();
+  }
+});
+
+document.addEventListener('DOMContentLoaded', loadMethods);
+</script>
+</body>
+</html>
