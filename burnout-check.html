@@ -947,22 +947,24 @@ let answers = new Array(15).fill(null);
 let current = 0;
 let myMethods = [];
 let currentEmail = '';
+let currentUserId = '';
 
 /* ── AUTH ── */
 async function initAuth() {
   const { data: { session } } = await sb.auth.getSession();
   if (session) {
-    onSignedIn();
+    onSignedIn(session.user);
   } else {
     showPhase('phase-login');
   }
   sb.auth.onAuthStateChange((event, session) => {
-    if (event === 'SIGNED_IN') onSignedIn();
-    if (event === 'SIGNED_OUT') { myMethods = []; showPhase('phase-login'); }
+    if (event === 'SIGNED_IN') onSignedIn(session.user);
+    if (event === 'SIGNED_OUT') { myMethods = []; currentUserId = ''; showPhase('phase-login'); }
   });
 }
 
-function onSignedIn() {
+function onSignedIn(user) {
+  currentUserId = user.id;
   document.getElementById('btn-logout').style.display = 'block';
   showPhase('phase-intro');
   loadMethods();
@@ -973,10 +975,7 @@ async function sendOtp() {
   if (!email) return;
   currentEmail = email;
   document.getElementById('login-msg').textContent = '전송 중…';
-  const { error } = await sb.auth.signInWithOtp({
-    email,
-    options: { emailRedirectTo: window.location.href }
-  });
+  const { error } = await sb.auth.signInWithOtp({ email });
   if (error) {
     document.getElementById('login-msg').textContent = '오류: ' + error.message;
     return;
